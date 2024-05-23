@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+
+<head>
+    <title> Calculator</title>
+
+    <style>
+        . body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .calculator {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            overflow: hidden;
+        }
+
+        .display {
+            background-color: #a38a8a;
+            color: #fff;
+            font-size: 2em;
+            padding: 20px;
+            text-align: right;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .btn {
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            font-size: 1.5em;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px #999;
+            position: relative;
+        }
+
+        .btn:active {
+            background-color: #ccc;
+            box-shadow: 0 2px #666;
+            transform: translateY(2px);
+        }
+
+        .btn.operator {
+            background-color: #272625;
+            color: white;
+            box-shadow: 0 4px #444240;
+        }
+
+        #equals {
+            grid-column: span 3;
+            background-color: #ff9500;
+            color: white;
+            box-shadow: 0 4px #cc7700;
+        }
+
+        #clear {
+            background-color: #ff3b30;
+            color: white;
+            box-shadow: 0 4px #cc2d22;
+        }
+
+        #delete {
+            background-color: #272625;
+            color: white;
+            box-shadow: 0 4px #444240;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn" data-value="7">7</button>
+            <button class="btn" data-value="8">8</button>
+            <button class="btn" data-value="9">9</button>
+            <button class="btn operator" data-value="/">/</button>
+            <button class="btn" data-value="4">4</button>
+            <button class="btn" data-value="5">5</button>
+            <button class="btn" data-value="6">6</button>
+            <button class="btn operator" data-value="*">*</button>
+            <button class="btn" data-value="1">1</button>
+            <button class="btn" data-value="2">2</button>
+            <button class="btn" data-value="3">3</button>
+            <button class="btn operator" data-value="-">-</button>
+            <button class="btn" data-value="0">0</button>
+            <button class="btn" data-value=".">.</button>
+            <button class="btn" id="clear">C</button>
+            <button class="btn operator" data-value="+">+</button>
+
+            <button class="btn" id="equals">=</button>
+            <button class="btn" id="delete">DEL</button>
+
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const display = document.getElementById('display');
+            const buttons = document.querySelectorAll('.btn');
+            let currentInput = '';
+            let operator = null;
+            let fullExpression = '';
+
+            const updateDisplay = (text) => {
+                display.innerText = text;
+            };
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.getAttribute('data-value');
+
+                    if (value === null) {
+                        if (button.id === 'clear') {
+                            currentInput = '';
+                            fullExpression = '';
+                            operator = null;
+                            updateDisplay('0');
+                            return;
+                        }
+
+                        if (button.id === 'delete') {
+                            currentInput = currentInput.slice(0, -1);
+                            fullExpression = fullExpression.slice(0, -1);
+                            updateDisplay(fullExpression || '0');
+                            return;
+                        }
+
+                        if (button.id === 'equals') {
+                            if (currentInput !== '') {
+                                try {
+                                    currentInput = eval(fullExpression).toString();
+                                } catch (e) {
+                                    currentInput = 'Error';
+                                }
+                                fullExpression = currentInput;
+                                updateDisplay(currentInput);
+                            }
+                            return;
+                        }
+                    }
+
+                    if (['+', '-', '*', '/'].includes(value)) {
+                        if (currentInput === '' && fullExpression === '') return;
+                        if (currentInput === '') {
+                            fullExpression = fullExpression.slice(0, -1) + value;
+                        } else {
+                            fullExpression += value;
+                        }
+                        currentInput = '';
+                        operator = value;
+                        updateDisplay(fullExpression);
+                        return;
+                    }
+
+                    if (value === '.' && currentInput.includes('.')) return;
+
+                    currentInput = (currentInput === '0' ? '' : currentInput) + value;
+                    fullExpression += value;
+                    updateDisplay(fullExpression);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
